@@ -82,7 +82,7 @@ Data Format Example : 2018.09.09
 **입력 값**
 
 ```
-https://alus20.tk/api/sc_meal.php?regCode=seoul&scCode=B100000456&scType=4&date=2018.09.10&mealType=3
+https://alus20.tk/api/sc_meal?regCode=seoul&scCode=B100000456&scType=4&date=2018.09.10&mealType=3
 ```
 
 제가 재학중인 고등학교가 아닌 그저 참고용입니다.

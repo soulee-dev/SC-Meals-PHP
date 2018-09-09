@@ -29,7 +29,7 @@ class Sc_Meal
         $date;
         $mealType;
 
-        if(!(isset($_GET['regCode']) && isset($_GET['scCode']) && isset($_GET['scType']))) {
+        if(!(isset($_GET['regCode']) || isset($_GET['scCode']) || isset($_GET['scType']))) {
             $this -> exceptionEx('Some arguments are missing!');
         }
 

@@ -13,7 +13,8 @@
 */
 require('ext/simple_html_dom.php');
 
-// error_reporting(0); // Disable error reporting for security, etc.. (Disabled for debug)
+header("Content-type: application/json; charset=utf-8");
+error_reporting(0); // Disable error reporting for security, etc.. (Disabled for debug)
 date_default_timezone_set('Asia/Seoul'); //Setup default timezone
 
 $scmeal = new Sc_Meal;
@@ -40,7 +41,6 @@ class Sc_Meal
             $date = $_GET['date'];
         }
 
-
         if(!(isset($_GET['mealType']))) {
             $mealType = 2;
         }
@@ -60,25 +60,33 @@ class Sc_Meal
         $ret = $dom -> find('table tbody tr td');
         $days = date('w', strtotime(str_replace(".", "-", $date)));
         $ret = str_replace(" ", "", $ret[7 + $days] -> innertext);
+        
 
-        if($ret == null) {echo('해당일에는 식단표가 존재하지 않습니다');return ;}
+        if($ret == null) {
+            $this -> outputJson("", $regCode, $scCode, $scType, $mealType, $date);
+        }
+
         $exp = preg_split('/<br[^>]*>/i', $ret);
 
-        $arr = array(
-            '지역 코드' => $regCode,
-            '학교 코드' => $scCode,
-            '날짜' => $date
-        );
+        $ret = "";
+
+        
 
         for($i = 0; $i < count($exp); $i++) 
         {
             if($exp[$i] == null) {
                 break;
             }
-            array_push($arr, $exp[$i]);
+
+            if($i == 0) {
+                $ret = $ret . $exp[$i];
+            }
+            else {
+                $ret = $ret . " " . $exp[$i];
+            }
         }
 
-        echo(json_encode($arr, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+        $this -> outputJson($ret, $regCode, $scCode, $scType, $mealType, $date);
     }
 
     function regionCheck($regCode)
@@ -172,6 +180,53 @@ class Sc_Meal
         }
 
         exit(1);
+    }
+
+    function outputJson($msg = null, $regCode, $scCode, $scType, $mealType, $date)
+    {
+        switch ($scType) {
+            case 1:
+                $scType = "유치원";
+                break;
+
+            case 2:
+                $scType = "초등학교";
+                break;
+
+            case 3:
+                $scType = "중학교";
+                break;
+
+            case 4:
+                $scType = "고등학교";
+                break;
+        }
+
+        switch ($mealType) {
+            case 1:
+                $mealType = "조식";
+                break;
+            case 2:
+                $mealType = "중식";
+                break;
+
+            case 3:
+                $mealType = "석식";
+                break;
+        }
+
+        $arr = array(
+            '지역 코드' => $regCode,
+            '학교 코드' => $scCode,
+            '학교 종류' => $scType,
+            '급식 종류' => $mealType,
+            '날짜' => $date,
+            '메뉴' => $msg
+        );
+
+        echo(json_encode($arr, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+
+        exit(0);
     }
 
 }
